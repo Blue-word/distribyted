@@ -28,7 +28,6 @@ require (
 require (
 	github.com/anacrolix/confluence v1.10.0 // indirect
 	github.com/fatih/color v1.13.0 // indirect
-	github.com/go-redis/redis v6.15.9+incompatible // indirect
 	github.com/golang/glog v1.0.0 // indirect
 	github.com/golang/groupcache v0.0.0-20210331224755-41bb18bfe9da // indirect
 	github.com/golang/snappy v0.0.4 // indirect
