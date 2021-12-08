@@ -4,7 +4,7 @@
 
 FROM golang:1.17-alpine as builder
 
-ENV BIN_REPO=github.com/distribyted/distribyted
+ENV BIN_REPO=github.com/Blue-word/distribyted
 ENV BIN_PATH=$GOPATH/src/$BIN_REPO
 
 COPY . $BIN_PATH

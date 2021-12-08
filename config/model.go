@@ -20,6 +20,13 @@ type Log struct {
 	Path       string `yaml:"path"`
 }
 
+type UserList []UserInfo
+
+type UserInfo struct {
+	User string `yaml:"user"`
+	Pass string `yaml:"pass"`
+}
+
 type TorrentGlobal struct {
 	AddTimeout      int    `yaml:"add_timeout,omitempty"`
 	GlobalCacheSize int64  `yaml:"global_cache_size,omitempty"`
