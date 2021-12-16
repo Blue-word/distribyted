@@ -4,7 +4,6 @@ import (
 	"bufio"
 	"fmt"
 	"github.com/distribyted/distribyted/http"
-	"github.com/distribyted/distribyted/module"
 	"github.com/distribyted/distribyted/webdav"
 	"os"
 	"os/signal"
@@ -172,7 +171,7 @@ func load(configPath string, port, webDAVPort int, fuseAllowOther bool) error {
 		log.Info().Msg("closing torrent client...")
 		c.Close()
 		log.Info().Msg("closing redis client...")
-		module.RedisClient.Close()
+		//module.RedisClient.Close()
 		log.Info().Msg("unmounting fuse filesystem...")
 		mh.Unmount()
 
