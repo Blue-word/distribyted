@@ -46,14 +46,14 @@ var apiRoutesHandler = func(ss *torrent.Stats) gin.HandlerFunc {
 var apiAddTorrentHandler = func(s *torrent.Service) gin.HandlerFunc {
 	return func(ctx *gin.Context) {
 		route := ctx.Param("route")
-
+		user := "blue"
 		var json RouteAdd
 		if err := ctx.ShouldBindJSON(&json); err != nil {
 			ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 			return
 		}
 
-		if err := s.AddMagnet(route, json.Magnet); err != nil {
+		if err := s.AddMagnet(route, json.Magnet, user); err != nil {
 			ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 			return
 		}

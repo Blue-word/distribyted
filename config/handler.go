@@ -39,6 +39,7 @@ func (c *Handler) createFromTemplateFile() ([]byte, error) {
 	return tb, ioutil.WriteFile(c.p, tb, 0644)
 }
 
+// 读取config.yaml，若无则从template中读取
 func (c *Handler) GetRaw() ([]byte, error) {
 	f, err := ioutil.ReadFile(c.p)
 	if os.IsNotExist(err) {
@@ -63,7 +64,7 @@ func (c *Handler) Get() (*Root, error) {
 	if err := yaml.Unmarshal(b, conf); err != nil {
 		return nil, fmt.Errorf("error parsing configuration file: %w", err)
 	}
-
+	// 填充默认值
 	conf = AddDefaults(conf)
 
 	return conf, nil

@@ -39,6 +39,7 @@ func New(fc *filecache.Cache, ss *torrent.Stats, s *torrent.Service, ch *config.
 	r.SetHTMLTemplate(t)
 
 	r.GET("/", indexHandler)
+	r.GET("/login", loginHandler)
 	r.GET("/routes", routesHandler(ss))
 	r.GET("/logs", logsHandler)
 	r.GET("/servers", serversFoldersHandler())

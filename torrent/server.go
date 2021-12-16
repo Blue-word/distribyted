@@ -72,7 +72,7 @@ func NewServer(c *torrent.Client, pc storage.PieceCompletion, cfg *config.Server
 
 func (s *Server) Start() error {
 	s.log.Info().Msg("starting new server folder")
-	w, err := fsnotify.NewWatcher()
+	w, err := fsnotify.NewWatcher() // 创建监听者
 	if err != nil {
 		return err
 	}

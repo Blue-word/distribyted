@@ -7,6 +7,10 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
+var loginHandler = func(c *gin.Context) {
+	c.HTML(http.StatusOK, "login.html", nil)
+}
+
 var indexHandler = func(c *gin.Context) {
 	c.HTML(http.StatusOK, "index.html", nil)
 }

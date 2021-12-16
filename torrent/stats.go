@@ -142,6 +142,7 @@ func (s *Stats) RoutesStats() []*RouteStats {
 
 	var out []*RouteStats
 	for r, tl := range s.torrentsByRoute {
+		// todo 根据前端账号控制返回router
 		var tStats []*TorrentStats
 		for _, t := range tl {
 			ts := s.stats(now, t, true)

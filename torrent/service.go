@@ -28,9 +28,11 @@ type Service struct {
 
 	log     zerolog.Logger
 	timeout int
+	user    string
 }
 
-func NewService(cfg loader.Loader, db loader.LoaderAdder, stats *Stats, c *torrent.Client, timeout int) *Service {
+func NewService(cfg loader.Loader, db loader.LoaderAdder, stats *Stats, c *torrent.Client,
+	timeout int, user string) *Service {
 	l := log.Logger.With().Str("component", "torrent-service").Logger()
 	return &Service{
 		log:       l,
@@ -40,6 +42,7 @@ func NewService(cfg loader.Loader, db loader.LoaderAdder, stats *Stats, c *torre
 		cfgLoader: cfg,
 		db:        db,
 		timeout:   timeout,
+		user:      user,
 	}
 }
 
@@ -56,7 +59,7 @@ func (s *Service) Load() (map[string]fs.Filesystem, error) {
 }
 
 func (s *Service) load(l loader.Loader) error {
-	list, err := l.ListMagnets()
+	list, err := l.ListMagnets(s.user)
 	if err != nil {
 		return err
 	}
@@ -68,7 +71,7 @@ func (s *Service) load(l loader.Loader) error {
 		}
 	}
 
-	list, err = l.ListTorrentPaths()
+	list, err = l.ListTorrentPaths(s.user)
 	if err != nil {
 		return err
 	}
@@ -83,13 +86,13 @@ func (s *Service) load(l loader.Loader) error {
 	return nil
 }
 
-func (s *Service) AddMagnet(r, m string) error {
+func (s *Service) AddMagnet(r, m string, user string) error {
 	if err := s.addMagnet(r, m); err != nil {
 		return err
 	}
 
 	// Add to db
-	return s.db.AddMagnet(r, m)
+	return s.db.AddMagnet(r, m, user)
 }
 
 func (s *Service) addTorrentPath(r, p string) error {

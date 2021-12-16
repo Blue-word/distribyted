@@ -14,9 +14,13 @@ func NewConfig(r []*config.Route) *Config {
 	}
 }
 
-func (l *Config) ListMagnets() (map[string][]string, error) {
+func (l *Config) ListMagnets(user string) (map[string][]string, error) {
 	out := make(map[string][]string)
 	for _, r := range l.c {
+		// todo 后续去掉config中的torrent
+		if r.Name != user {
+			continue
+		}
 		for _, t := range r.Torrents {
 			if t.MagnetURI == "" {
 				continue
@@ -29,9 +33,13 @@ func (l *Config) ListMagnets() (map[string][]string, error) {
 	return out, nil
 }
 
-func (l *Config) ListTorrentPaths() (map[string][]string, error) {
+func (l *Config) ListTorrentPaths(user string) (map[string][]string, error) {
 	out := make(map[string][]string)
 	for _, r := range l.c {
+		// todo 后续去掉config中的torrent
+		if r.Name != user {
+			continue
+		}
 		for _, t := range r.Torrents {
 			if t.TorrentPath == "" {
 				continue

@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+
+<head>
+    {{template "header.html" "Routes"}}
+</head>
+
+
+<body class="header-fixed sidebar-fixed sidebar-dark header-light" id="body">
+<div class="wrapper">
+    {{template "navbar.html" "login"}}
+
+    <div class="page-wrapper">
+        <!-- Header -->
+        <header class="main-header " id="header">
+            <nav class="navbar navbar-static-top navbar-expand-lg">
+                <!-- Sidebar toggle button -->
+                <button id="sidebar-toggler" class="sidebar-toggle">
+                    <span class="sr-only">123Toggle navigation</span>
+                </button>
+            </nav>
+        </header>
+
+
+        <div class="content-wrapper">
+            <div class="content">
+                <div class="card card-default">
+                    <div class="card-header card-header-border-bottom">
+                        <h2>please log in first</h2>
+
+                    </div>
+                    <div class="card-body">
+                        <form id="new-magnet">
+                            <div class="form-group">
+                                <label>username</label>
+                                <input type="text" id="username" class="form-control"
+                                       placeholder="Enter your username">
+                            </div>
+                            <div class="form-group">
+                                <label>passwordd</label>
+                                <input type="password" id="password" class="form-control"
+                                       placeholder="Enter your password">
+                            </div>
+                            <div class="form-group">
+                                <button type="submit" class="btn btn-primary btn-default">Submit</button>
+                            </div>
+                            <div class="form-footer pt-4 pt-5 mt-4 border-top">
+                                <div class="sk-double-bounce" id="submit_magnet_loading" style="display: none;">
+                                    <div class="double-bounce1"></div>
+                                    <div class="double-bounce2"></div>
+                                </div>
+                            </div>
+
+                        </form>
+                    </div>
+                </div>
+            </div>
+
+            <footer class="footer mt-auto">
+                <div class="copyright bg-white">
+                </div>
+            </footer>
+
+        </div>
+    </div>
+
+    {{template "footer.html"}}
+
+    <script>
+
+    </script>
+</body>
+
+</html>
