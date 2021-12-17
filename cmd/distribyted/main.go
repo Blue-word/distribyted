@@ -3,7 +3,10 @@ package main
 import (
 	"bufio"
 	"fmt"
+	"github.com/distribyted/distribyted/fs"
 	"github.com/distribyted/distribyted/http"
+	"github.com/distribyted/distribyted/module"
+	"github.com/distribyted/distribyted/torrent/loader"
 	"github.com/distribyted/distribyted/webdav"
 	"os"
 	"os/signal"
@@ -139,6 +142,12 @@ func load(configPath string, port, webDAVPort int, fuseAllowOther bool) error {
 			return fmt.Errorf("error starting server: %w", err)
 		}
 	}
+
+	// 初始化badger数据库
+	if err = module.InitBadger(conf); err != nil {
+		return err
+	}
+
 	// todo
 	/*cl := loader.NewConfig(conf.Routes)
 	ss := torrent.NewStats()
@@ -168,9 +177,10 @@ func load(configPath string, port, webDAVPort int, fuseAllowOther bool) error {
 		fis.Close()
 		log.Info().Msg("closing magnet database...")
 		//dbl.Close()
+		module.Badger.Close()
 		log.Info().Msg("closing torrent client...")
 		c.Close()
-		log.Info().Msg("closing redis client...")
+		//log.Info().Msg("closing redis client...")
 		//module.RedisClient.Close()
 		log.Info().Msg("unmounting fuse filesystem...")
 		mh.Unmount()
@@ -216,15 +226,20 @@ func load(configPath string, port, webDAVPort int, fuseAllowOther bool) error {
 		log.Warn().Msg("webDAV configuration not found!")
 	}()
 
-	//cfs, err := fs.NewContainerFs(fss)
-	//if err != nil {
-	//	return fmt.Errorf("error when loading torrents: %w", err)
-	//}
+	var routes []*config.Route
+	cl := loader.NewConfig(routes)
+	ss := torrent.NewStats()
+	ts := torrent.NewService(cl, module.Badger, ss, c, conf.Torrent.AddTimeout, "blue")
+	fss, _ := ts.Load123()
+	cfs, err := fs.NewContainerFs(fss)
+	if err != nil {
+		return fmt.Errorf("error when loading torrents: %w", err)
+	}
 
-	//httpfs := torrent.NewHTTPFS(cfs)
+	httpfs := torrent.NewHTTPFS(cfs)
 	logFilename := filepath.Join(conf.Log.Path, dlog.FileName)
 
-	err = http.New(fc, nil, nil, ch, servers, nil, logFilename, conf.HTTPGlobal)
+	err = http.New(fc, ss, ts, ch, servers, httpfs, logFilename, conf.HTTPGlobal)
 	log.Error().Err(err).Msg("error initializing HTTP server")
 	return err
 }

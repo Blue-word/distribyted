@@ -58,6 +58,10 @@ func (s *Service) Load() (map[string]fs.Filesystem, error) {
 	return s.fss, s.load(s.db)
 }
 
+func (s *Service) Load123() (map[string]fs.Filesystem, error) {
+	return s.fss, nil
+}
+
 func (s *Service) load(l loader.Loader) error {
 	list, err := l.ListMagnets(s.user)
 	if err != nil {

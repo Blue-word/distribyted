@@ -11,7 +11,6 @@ import (
 	"github.com/distribyted/distribyted/torrent/loader"
 	"golang.org/x/net/webdav"
 	"net/http"
-	"path/filepath"
 	"time"
 	"unsafe"
 
@@ -45,23 +44,23 @@ func NewWebDAVServer(fs fs.Filesystem, port int, user, pass string) error {
 
 func NewWebDAVServer1(conf *config.Root, c *torrent.Client) error {
 	log.Info().Str("host", fmt.Sprintf("0.0.0.0:%d", conf.WebDAV.Port)).Msg("starting webDAV server")
-	// badger多个进程无法同时打开同一个数据库，先初始化一个实例
-	dbl, err := loader.NewDB(filepath.Join(conf.Torrent.MetadataFolder, "magnetdb"))
-	if err != nil {
-		// todo 日志
-		return fmt.Errorf("error starting magnet database: %w", err)
-	}
-	defer dbl.Close()
+
+	//dbl, err := loader.NewDB(filepath.Join(conf.Torrent.MetadataFolder, "magnetdb"))
+	//if err != nil {
+	//	// todo 日志
+	//	return fmt.Errorf("error starting magnet database: %w", err)
+	//}
+	//defer dbl.Close()
 
 	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
 		username, password, _ := r.BasicAuth()
 		fmt.Print(username)
 		if username != "" {
-			if !validUser(dbl, username, password) {
+			if !validUser(username, password) {
 				goto unAuth
 			}
 			// todo 先简单处理一下账号权限目录
-			srv, _ := doHttp(username, dbl, conf, c)
+			srv, _ := doHttp(username, conf, c)
 			srv.ServeHTTP(w, r)
 			return
 		}
@@ -75,8 +74,8 @@ func NewWebDAVServer1(conf *config.Root, c *torrent.Client) error {
 }
 
 // 校验用户
-func validUser(dbl *loader.DB, user, password string) bool {
-	resPw, err := dbl.GetUserPassword(user)
+func validUser(user, password string) bool {
+	resPw, err := module.Badger.GetUserPassword(user)
 	if err != nil {
 		// todo 日志
 	}
@@ -86,7 +85,7 @@ func validUser(dbl *loader.DB, user, password string) bool {
 	return true
 }
 
-func doHttp(user string, dbl *loader.DB, conf *config.Root, c *torrent.Client) (*webdav.Handler, error) {
+func doHttp(user string, conf *config.Root, c *torrent.Client) (*webdav.Handler, error) {
 	var (
 		err error
 	)
@@ -104,13 +103,14 @@ func doHttp(user string, dbl *loader.DB, conf *config.Root, c *torrent.Client) (
 	}
 	cl := loader.NewConfig(routes)
 	ss := mTorrent.NewStats()
-	tus := mTorrent.NewService(cl, dbl, ss, c, conf.Torrent.AddTimeout, user)
+	tus := mTorrent.NewService(cl, module.Badger, ss, c, conf.Torrent.AddTimeout, user)
 	fss, err := tus.Load()
 	if err != nil {
 		return nil, fmt.Errorf("error when loading torrents: %w", err)
 	}
 
 	mh := fuse.NewHandler(conf.Fuse.AllowOther, conf.Fuse.Path)
+	log.Info().Msg(fmt.Sprintf("当前mount用户：%s", user))
 	if err := mh.Mount(fss); err != nil {
 		log.Info().Err(err).Msg("error mounting filesystems")
 	}
