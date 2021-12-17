@@ -8,7 +8,7 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
-const m1 = "magnet:?xt=urn:btih:c9e15763f722f23e98a29decdfae341b98d53056"
+const m1 = "magnet:?xt=urn:btih:a88fda5954e89178c372716a6a78b8180ed4dad3"
 
 func TestAddUser(t *testing.T) {
 	require := require.New(t)
