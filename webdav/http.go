@@ -73,7 +73,7 @@ func NewWebDAVServer1(conf *config.Root, c *torrent.Client) error {
 	return http.ListenAndServe(fmt.Sprintf("0.0.0.0:%d", conf.WebDAV.Port), nil)
 }
 
-// 校验用户
+// validUser 校验用户
 func validUser(user, password string) bool {
 	resPw, err := module.Badger.GetUserPassword(user)
 	if err != nil {

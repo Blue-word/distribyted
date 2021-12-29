@@ -34,6 +34,13 @@ func TestAddUser(t *testing.T) {
 	pass, err = db.GetUserPassword(user2)
 	require.NoError(err)
 	fmt.Println(pass)
+
+	user3 := "admin"
+	err = db.AddUser(user3, "admin")
+	require.NoError(err)
+	pass, err = db.GetUserPassword(user3)
+	require.NoError(err)
+	fmt.Println(pass)
 }
 
 func TestAddMagnet(t *testing.T) {

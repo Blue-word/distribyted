@@ -3,10 +3,8 @@ package main
 import (
 	"bufio"
 	"fmt"
-	"github.com/distribyted/distribyted/fs"
 	"github.com/distribyted/distribyted/http"
 	"github.com/distribyted/distribyted/module"
-	"github.com/distribyted/distribyted/torrent/loader"
 	"github.com/distribyted/distribyted/webdav"
 	"os"
 	"os/signal"
@@ -148,17 +146,6 @@ func load(configPath string, port, webDAVPort int, fuseAllowOther bool) error {
 		return err
 	}
 
-	// todo
-	/*cl := loader.NewConfig(conf.Routes)
-	ss := torrent.NewStats()
-
-	dbl, err := loader.NewDB(filepath.Join(conf.Torrent.MetadataFolder, "magnetdb"))
-	if err != nil {
-		return fmt.Errorf("error starting magnet database: %w", err)
-	}
-
-	ts := torrent.NewService(cl, dbl, ss, c, conf.Torrent.AddTimeout)*/
-
 	mh := fuse.NewHandler(fuseAllowOther || conf.Fuse.AllowOther, conf.Fuse.Path)
 
 	sigChan := make(chan os.Signal)
@@ -192,32 +179,12 @@ func load(configPath string, port, webDAVPort int, fuseAllowOther bool) error {
 	log.Info().Msg(fmt.Sprintf("setting cache size to %d MB", conf.Torrent.GlobalCacheSize))
 	fc.SetCapacity(conf.Torrent.GlobalCacheSize * 1024 * 1024)
 
-	/*fss, err := ts.Load()
-	if err != nil {
-		return fmt.Errorf("error when loading torrents: %w", err)
-	}
-
-	go func() {
-		if err := mh.Mount(fss); err != nil {
-			log.Info().Err(err).Msg("error mounting filesystems")
-		}
-	}()*/
-
 	go func() {
 		if conf.WebDAV != nil {
 			if webDAVPort != 0 {
 				conf.WebDAV.Port = webDAVPort
 				port = webDAVPort
 			}
-
-			/*cfs, err := fs.NewContainerFs(fss)
-			if err != nil {
-				log.Error().Err(err).Msg("error adding files to webDAV")
-				return
-			}
-			if err := webdav.NewWebDAVServer(cfs, port, conf.WebDAV.User, conf.WebDAV.Pass); err != nil {
-				log.Error().Err(err).Msg("error starting webDAV")
-			}*/
 			if err := webdav.NewWebDAVServer1(conf, c); err != nil {
 				log.Error().Err(err).Msg("error starting webDAV")
 			}
@@ -226,20 +193,7 @@ func load(configPath string, port, webDAVPort int, fuseAllowOther bool) error {
 		log.Warn().Msg("webDAV configuration not found!")
 	}()
 
-	var routes []*config.Route
-	cl := loader.NewConfig(routes)
-	ss := torrent.NewStats()
-	ts := torrent.NewService(cl, module.Badger, ss, c, conf.Torrent.AddTimeout, "blue")
-	fss, _ := ts.Load123()
-	cfs, err := fs.NewContainerFs(fss)
-	if err != nil {
-		return fmt.Errorf("error when loading torrents: %w", err)
-	}
-
-	httpfs := torrent.NewHTTPFS(cfs)
-	logFilename := filepath.Join(conf.Log.Path, dlog.FileName)
-
-	err = http.New(fc, ss, ts, ch, servers, httpfs, logFilename, conf.HTTPGlobal)
+	err = http.NewGin(conf)
 	log.Error().Err(err).Msg("error initializing HTTP server")
 	return err
 }

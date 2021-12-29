@@ -2,6 +2,7 @@ package http
 
 import (
 	"fmt"
+	"github.com/distribyted/distribyted/controller"
 	"net/http"
 
 	"github.com/anacrolix/missinggo/v2/filecache"
@@ -62,5 +63,27 @@ func New(fc *filecache.Cache, ss *torrent.Stats, s *torrent.Service, ch *config.
 		return fmt.Errorf("error initializing server: %w", err)
 	}
 
+	return nil
+}
+
+func NewGin(conf *config.Root) error {
+	router := gin.Default()
+	// noAuth：无需登录
+	noAuth := router.Group("/v1")
+	{
+		noAuth.POST("/login", controller.UserLogin)
+		noAuth.GET("/user/info", controller.UserInfo)
+		//noAuth.POST("/read", readEndpoint)
+	}
+
+	// auth：需要登录
+	//auth := router.Group("/v2")
+	//{
+	//	auth.POST("/login", loginEndpoint)
+	//	auth.POST("/submit", submitEndpoint)
+	//	auth.POST("/read", readEndpoint)
+	//}
+
+	router.Run(":4444")
 	return nil
 }
