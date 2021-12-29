@@ -11,6 +11,7 @@ func UserLogin(c *gin.Context) {
 	data, err := server.UserLogin(username, password)
 	if err != nil {
 		ErrorJson(c, data, err.Error())
+		return
 	}
 	SuccessJson(c, data, "")
 }
@@ -20,6 +21,7 @@ func UserInfo(c *gin.Context) {
 	data, err := server.UserInfo(token)
 	if err != nil {
 		ErrorJson(c, data, err.Error())
+		return
 	}
 	SuccessJson(c, data, "")
 }
